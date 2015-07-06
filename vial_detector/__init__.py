@@ -1,2 +1,2 @@
-from vial_detector import *
+from vial_detector import detector
 #from .DectFrame import *
