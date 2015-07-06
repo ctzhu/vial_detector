@@ -1,5 +1,5 @@
 import wx
-import DectFrame
+from vial_detector import DectFrame
 import sys
 
 

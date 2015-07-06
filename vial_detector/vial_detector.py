@@ -1,10 +1,8 @@
-import matplotlib.cm as cm
 import numpy as np
-import pandas as pd
 import subprocess as sp
 import trackpy as tp
 import matplotlib.cm as cm
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 class detector(object):
     '''Docstring
@@ -50,6 +48,10 @@ class detector(object):
         del pipe
         self.img_stack = image.reshape((self.img_nFrame, y_size, x_size, 3))
         self.img_dim   = (x_size, y_size)
+        try:
+            plt.rcParams.keys()
+        except:
+            import matplotlib.pyplot as plt
 
 
 
