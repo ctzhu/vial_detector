@@ -1,6 +1,9 @@
 import wx
-from vial_detector import DectFrame
 import sys
+import matplotlib
+matplotlib.use('WXAgg')
+from vial_detector import DectFrame
+
 
 
 class App(wx.App):

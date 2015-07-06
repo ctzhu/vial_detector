@@ -7,11 +7,6 @@ import time
 import numpy as np
 import pandas as pd
 
-import matplotlib
-print matplotlib.get_backend()
-if matplotlib.get_backend().upper() != 'WXAGG':
-    matplotlib = reload(matplotlib)
-matplotlib.use('WXAgg')
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.figure import Figure
 from matplotlib.patches import Rectangle
