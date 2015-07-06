@@ -1,2 +1,2 @@
-from .vial_detector import *
+from vial_detector.vial_detector import *
 #from .DectFrame import *
