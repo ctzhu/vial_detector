@@ -353,7 +353,7 @@ class DectFrame(wx.Frame):
         try:
             x1 = int(event.xdata)
             y1 = int(event.ydata)
-            if any([self.x1!==x1, self.y1!==y1]):
+            if any([self.x1!=x1, self.y1!=y1]):
                 self.x1 = x1
                 self.y1 = y1
                 self.rect.set_xy((self.x0, self.y0))
