@@ -351,14 +351,19 @@ class DectFrame(wx.Frame):
     def redraw_rect(self, event):
         '''Draw the ROI rectangle overlay'''
         try:
-            self.x1 = int(event.xdata)
-            self.y1 = int(event.ydata)
-            self.rect.set_xy((self.x0, self.y0))
-            self.rect.set_width(self.x1 - self.x0)
-            self.rect.set_height(self.y1 - self.y0)
+            x1 = int(event.xdata)
+            y1 = int(event.ydata)
+            if any([self.x1!==x1, self.y1!==y1]):
+                self.x1 = x1
+                self.y1 = y1
+                self.rect.set_xy((self.x0, self.y0))
+                self.rect.set_width(self.x1 - self.x0)
+                self.rect.set_height(self.y1 - self.y0)
+                self.canvas.draw()
+            else:
+                pass
         except:
             pass
-        self.canvas.draw()
 
 
 
