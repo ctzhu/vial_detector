@@ -4,6 +4,7 @@ import trackpy as tp
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import pandas as pd
+from trackpy.utils import print_update
 
 class detector(object):
     '''A background referenced particle detector.  It calucaltes an average image, taken from the earlist
@@ -236,7 +237,7 @@ class detector(object):
                 _f_df['frame']         = _idx                      #must have it to make the tracker work
             particle_dfs.append(_f_df)
             if Print:
-                print _idx,
+                print_update('Analyzing frame %s'%_idx)
             self.particle_dfs = particle_dfs
         return particle_dfs
 
