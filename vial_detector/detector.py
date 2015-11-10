@@ -3,13 +3,28 @@ import subprocess as sp
 import trackpy as tp
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
+import pandas as pd
 
 class detector(object):
-    '''Docstring
+    '''A background referenced particle detector.  It calucaltes an average image, taken from the earlist
+    a few frames of a video.  Each of video frame is then compared to this background image.  If a particle
+    exsits on the background image already, it is then either a background feature or a particle have never
+    moved, therefore labeled as a FALSE particle.  Those particles not detected on the background image is 
+    labeled as TRUE particle.
+
+    Image reading     : FFMEPG (pyAV has problems with non-standard frame rate videos as of 2015)
+    particle detection: softmatter/trackpy
+
     '''
     
     
     def __init__(self, video_file, resolution='default', frame_rate='default', frames=-1, bufsize=10**9):
+        '''video_file : name of the video_file
+        resolution : automatically detected with 'default'.  Override possible with an (int, int) tuple
+        frame_rate : automatically detected with 'default'.  Override possible with an int
+        frames     : processing a subset of frames (not implemented)
+        bufsize    : allocate enough RAM for in memeory processing
+        '''
         #self.frame_rate = frame_rate
         #x_size, y_size = resolution
         
@@ -51,6 +66,16 @@ class detector(object):
 
 
     def plot_partest(self, pars, axes):
+        '''Sort of a one thing does all method. For visual inspection of whether the parameters provided
+        will give a good result.
+
+        pars : parameters to be tested (such as the one fed from the GUI)
+        axes : a matplotlib.axes instance
+
+        Result:
+        A plot constrast an earlier frame with a later frame. Particles are plotted with '+', with the 
+        True dots further plotted with 'o'.
+        '''
         x, y, h, w, fr1, fr2, bckgrf1, bckgrf2, thld, diameter, minmass, maxdia, addArgs = pars
         x_max = x+w
         y_max = y+h
@@ -94,6 +119,8 @@ class detector(object):
         
 
     def show_ROI(self, x_lim, y_lim):
+        '''display the region of interest (ROI). Using the 1st frame as reference image.
+        '''
         x_min, x_max = x_lim
         y_min, y_max = y_lim
         #limit_high = 350
@@ -114,6 +141,8 @@ class detector(object):
         
         
     def set_ROI(self, x_lim, y_lim):
+        '''defines the region of interest (ROI) and convert the image into grayscale image
+        '''
         x_min, x_max = x_lim
         y_min, y_max = y_lim
         #apply ROI to image stack
@@ -129,6 +158,8 @@ class detector(object):
                 
                 
     def show_30frames(self):
+        '''Show the 1st 30 frames of a video, in a 5*6 subplot
+        '''
         fig, axes = plt.subplots(nrows=5, ncols=6, figsize=(20, 14))
         for i, ax in enumerate(axes.ravel()):
             ax.imshow(self.img_stack[i,:,:], cmap=cm.Greys_r)
@@ -138,6 +169,9 @@ class detector(object):
             
             
     def set_backgrd(self, frames, how='mean'):
+        '''calculate the mean, or the median (controlled by `how`) of the set of image defined by `frames`
+        and use the resultant as the background image. 
+        '''
         if how == 'mean':
             f  = np.mean
         if how == 'median':
@@ -161,6 +195,7 @@ class detector(object):
 
         
     def _area_density(self, x, y, r, img):
+        '''return the density of the cicle, with radius `r`, centered at `(x, y)`, on image `img`'''
         #x, y coordinates
         y_arr, x_arr = np.indices(img.shape)
         mask         = (((x_arr-x)**2 + (y_arr-y)**2) < r*r)
@@ -175,6 +210,13 @@ class detector(object):
                       diameter=(5,5), 
                       minmass=300, 
                       invert=True)
+        thld : thershold, a TRUE particle must be darker than the backgroud image by this amount
+        progress_barF : a handle for external status bar (such as in a GUI)
+        Print         : print out this frame number that is currently processing
+        **kwars       : additional parameters passed to trackpy.locate() method
+
+        Returns
+        a pandas.DataFrame containing the information of all particles (both True and False ones) detected
         '''
         particle_dfs = []
         for _idx, _img in enumerate(self.img_stack):
@@ -191,6 +233,7 @@ class detector(object):
                                     for i in range(len(_f_df))]
                 _f_df['True_particle'] = (_f_df['ST_dsty']>thld)
                 _f_df['Timestamp']     = _idx*(1./self.frame_rate) #if frame rate is know may convert to timestamp
+                _f_df['frame']         = _idx                      #must have it to make the tracker work
             particle_dfs.append(_f_df)
             if Print:
                 print _idx,
@@ -200,6 +243,16 @@ class detector(object):
 
 
     def diagnostic_plot(self, img_index, ax=None, SZ_true_dot=30, SZ_fake_dot=50):
+        '''Diagnostic plot of tracking result
+        
+        img_index  : which frame to be plotted.
+        ax         : a matplotlib.axes, will create a new one if not provided
+        SZ_true_dot: marker size for true particles
+        SZ_fake_dot: marker size for fake particles
+
+        returns the matplotlib.axes instance.
+        In the plot, the dots are plotted as '+' and the true dots are further superimposed with 'o'
+        '''
         f_df = self.particle_dfs[img_index]
         #actually plotting
         if ax==None:
@@ -221,8 +274,19 @@ class detector(object):
     
 
 
-    def particle_tracking(particle_df):
-        #not implemented
-        #trackedP_df=[]
-        #return trackedP_df
-        pass
+    def particle_tracking(self, search_range, length_cutoff, **kwargs):
+        '''Tracking method. One must run particle detection first before this. 
+        
+        search_range : the max distance that two particles will be joined in one track
+        length_cutoff: the min length (in frames) that a track must have
+        **kwargs     : other parameters passed to trackpy.link_df method
+
+        returns: pandas.DataFrame containing the tracks
+        '''
+        #must use a dataframe containing true dots only
+        particles = pd.concat([item[item.True_particle] for item in self.particle_dfs])
+        tracks    = tp.link_df(particles, search_range=search_range, **kwargs)
+        if length_cutoff > 0:
+            tracks = tp.filter_stubs(tracks, length_cutoff)
+        self.tracks = tracks
+        return tracks
