@@ -13,4 +13,4 @@ Where to find support?
 
 [**Read the documentation**](https://github.com/ctzhu/vial_detector/blob/master/doc/Guide.txt) for instructions.
 
-If you use trackpy for published research, please contact me as `vial_detector` has not yet been published.
+If you use vial_detector for published research, please contact me as `vial_detector` has not yet been published.
