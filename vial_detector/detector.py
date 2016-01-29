@@ -4,7 +4,16 @@ import trackpy as tp
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import pandas as pd
-from trackpy.utils import print_update
+#from trackpy.utils import print_update
+
+def print_update(message):
+    "Print a message immediately; do not wait for current execution to finish."
+    try:
+        clear_output()
+    except Exception:
+        pass
+    print(message)
+    sys.stdout.flush()
 
 class detector(object):
     '''A background referenced particle detector.  It calucaltes an average image, taken from the earlist
