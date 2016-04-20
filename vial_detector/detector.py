@@ -4,6 +4,10 @@ import trackpy as tp
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 import pandas as pd
+try:
+    from IPython.core.display import clear_output
+except:
+    pass
 #from trackpy.utils import print_update
 
 def print_update(message):
