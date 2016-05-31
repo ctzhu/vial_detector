@@ -48,5 +48,5 @@ setup(name='vial_detector',
       keywords='image processing particle detection',
 
       packages=['vial_detector'],
-      install_requires=['matplotlib', 'numpy', 'scipy', 'pandas', 'trackpy'],
+      install_requires=['matplotlib', 'numpy', 'scipy', 'pandas', 'trackpy==0.2.4'],
       zip_safe=False)
