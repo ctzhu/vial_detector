@@ -8,6 +8,8 @@ What is it?
 
 **[Read the minimal example](http://nbviewer.ipython.org/github/ctzhu/vial_detector/blob/master/examples/Workflow_example.ipynb)** for a simple workflow in `IPython Notebook` or **[try the `wxpython` based GUI](https://github.com/ctzhu/vial_detector/blob/master/examples/vial_detector_gui.py)**
 
+To install, run `pip intall git+https://github.com/ctzhu/vial_detector`
+
 Where to find support?
 -------------
 
